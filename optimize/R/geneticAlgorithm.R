@@ -17,10 +17,10 @@ naturalSelection <- function(population, objectiveFunction ){
 }
 
 crossover <- function(trip, df){
-  x <-sample(2:(length(trip$trip)-1), 2, replace = FALSE)
-  temp <-trip$trip[x[1]]
-  trip$trip[x[1]] <- trip$trip[x[2]]
-  trip$trip[x[2]] <- temp
+  x <-sample(2:(length(trip$trip)-1), 10, replace = FALSE)
+  temp <-trip$trip[x[1:5]]
+  trip$trip[x[1:5]] <- trip$trip[x[6:10]]
+  trip$trip[x[6:10]] <- temp
   trip <- calculateDistance(trip$trip, df)
   return(trip)
 }
@@ -50,13 +50,13 @@ geneticAlgorithm <- function(nPopulation, df){
   generation <- generation %>%
     naturalSelection(., mean)
   diffLength <- nPopulation - length(generation)
-  toCross <-sample(seq_along(generation), 0.3*diffLength)
+  toCross <-sample(seq_along(generation), 0.2*diffLength)
   generation <- append(generation,
                        lapply(toCross, function(x){
                          generation[[x]] %>%
                            crossover(., df)})
   )
-  toMut <-sample(seq_along(generation), 0.25*diffLength)
+  toMut <-sample(seq_along(generation), 0.08*diffLength)
   generation <- append(generation,
                        lapply(toMut, function(x){
                          generation[[x]] %>%
@@ -79,12 +79,4 @@ geneticAlgorithm <- function(nPopulation, df){
 }
 
 
-generationLoop <- function(nGeneration, nPopulation, df){
-  purrr::map(seq_len(nGeneration), ~ geneticAlgorithm(nPopulation, df))[[nGeneration]] %>%
-    naturalSelection(., min)
-}
-
-df <- readMyCsvData()
-
-generationLoop(10, 50, df) -> tst
 
