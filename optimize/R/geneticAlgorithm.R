@@ -16,17 +16,17 @@ naturalSelection <- function(population, objectiveFunction ){
                unlist]
 }
 
-crossover <- function(trip){
+crossover <- function(trip, df){
   x <-sample(2:(length(trip$trip)-1), 2, replace = FALSE)
   temp <-trip$trip[x[1]]
   trip$trip[x[1]] <- trip$trip[x[2]]
   trip$trip[x[2]] <- temp
-  trip <- calculateDistance(trip$trip)
+  trip <- calculateDistance(trip$trip, df)
   return(trip)
 }
 
-mutation <- function(trip){
-  mutated <- crossover(trip)
+mutation <- function(trip, df){
+  mutated <- crossover(trip, df)
   delta <- trip$distance - mutated$distance
   if(delta > 0 |
      exp(-delta/runif(1, min = 0.5, max = 10)) > runif(1, min = 0, max = 1)){
@@ -38,7 +38,7 @@ mutation <- function(trip){
 
 
 
-geneticAlgorithm <- function(nPopulation){
+geneticAlgorithm <- function(nPopulation, df){
 
   generation <- lapply(seq.int(nPopulation),
                        FUN =function(x) {
@@ -54,13 +54,13 @@ geneticAlgorithm <- function(nPopulation){
   generation <- append(generation,
                        lapply(toCross, function(x){
                          generation[[x]] %>%
-                           crossover()})
+                           crossover(., df)})
   )
   toMut <-sample(seq_along(generation), 0.25*diffLength)
   generation <- append(generation,
                        lapply(toMut, function(x){
                          generation[[x]] %>%
-                           mutation()})
+                           mutation(., df)})
   )
   diffLength <- nPopulation - length(generation)
   idx <- order(sapply(generation, "[[", "distance"))[1:(0.5*diffLength)]
@@ -79,9 +79,12 @@ geneticAlgorithm <- function(nPopulation){
 }
 
 
-generationLoop <- function(nGeneration, nPopulation){
-  purrr::map(seq_len(nGeneration), ~ geneticAlgorithm(nPopulation))[[nGeneration]] %>%
+generationLoop <- function(nGeneration, nPopulation, df){
+  purrr::map(seq_len(nGeneration), ~ geneticAlgorithm(nPopulation, df))[[nGeneration]] %>%
     naturalSelection(., min)
 }
 
-generationLoop(10, 50) -> tst
+df <- readMyCsvData()
+
+generationLoop(10, 50, df) -> tst
+

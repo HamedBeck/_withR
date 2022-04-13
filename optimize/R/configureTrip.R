@@ -35,7 +35,7 @@ configureTrip <- function(df){
 }
 
 
-calculateDistance <- function(trip, df=readMyCsvData()){
+calculateDistance <- function(trip, df){
 
   distance <- c()
   for (i in seq.int(1 ,length(trip)-1)) {
