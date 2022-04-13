@@ -1,7 +1,22 @@
 
 library(magrittr)
+#' Beregn justering byggeomkostning
+#'
+#' @description
+#' Funktion til at beregne den samlede justering af enten additive eller
+#' multiplikative faktorer.
+#'
+#' @param scr \code{data.frame} Scoredata.
+#' @param katalog \code{data.frame} Katalog med informationer om justeringer.
+#' @param byggeri_type \code{character} Byggeritype.
+#' @param type \code{character} 'additiv' eller 'multiplikativ'.
+#' @param basisfaktor,basispris TODO: skal dokumenteres
+#' @return \code{tibble} Samlet justering.
+#'
+#' @export
 
-readMyCsvData <- function(path ="~/my-r/city_data.csv"){
+
+readMyCsvData <- function(path ="~/_withR-master/city_data.csv"){
 
   df <- readr::read_csv(path, show_col_types = FALSE) %>%
     as.data.frame()
@@ -20,7 +35,7 @@ configureTrip <- function(df){
 }
 
 
-calculateDistance <- function(trip, df){
+calculateDistance <- function(trip, df=readMyCsvData()){
 
   distance <- c()
   for (i in seq.int(1 ,length(trip)-1)) {
